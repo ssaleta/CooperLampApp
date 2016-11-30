@@ -1,19 +1,16 @@
 package com.example.sebastian.cooperlampapp;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.RadioButton;
+import android.util.Log;
 import android.widget.RadioGroup;
-import android.widget.Switch;
 import android.widget.Toast;
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -26,28 +23,48 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup radioGroup;
     private String macAdressHC06 = "98:D3:31:90:32:EE";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        bt = new BluetoothSPP(this);
+        bluetoothAdapter = bt.getBluetoothAdapter();
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if(checkedId == R.id.on){
                     sendMessage("1");
-                }else if(checkedId == R.id.off){
+                } else if(checkedId == R.id.off){
                     sendMessage("2");
                 }
             }
         });
-        bt = new BluetoothSPP(this);
-        bluetoothAdapter = bt.getBluetoothAdapter();
         initializeFilters();
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+
+               Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
+            public void onDeviceConnected(String name, String address) {
+                Toast.makeText(getApplicationContext()
+                        , "Connected to " + name + "\n" + address
+                        , Toast.LENGTH_SHORT).show();
+            }
+
+            public void onDeviceDisconnected() {
+                Toast.makeText(getApplicationContext()
+                        , "Connection lost", Toast.LENGTH_SHORT).show();
+            }
+
+            public void onDeviceConnectionFailed() {
+                Toast.makeText(getApplicationContext()
+                        , "Unable to connect", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -66,12 +83,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     @Override
+    public void onDestroy(){
+        super.onDestroy();
+        try{
+            if(mReceiver!=null)
+                unregisterReceiver(mReceiver);
+            }catch(Exception e){
+            }
+            super.onDestroy();
+            }
+
+    @Override
     public void onResume(){
         super.onResume();
-        bt.setupService();
-        bt.startService(BluetoothState.DEVICE_OTHER);
-        bt.connect(macAdressHC06);
-    }
+      }
 
     public void sendMessage(String string) {
         bt.send(string, true);
@@ -98,8 +123,10 @@ public class MainActivity extends AppCompatActivity {
                         BluetoothAdapter.ERROR);
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
+                        Toast.makeText(MainActivity.this,"BT OFF", Toast.LENGTH_SHORT).show();
                         break;
                     case BluetoothAdapter.STATE_ON:
+                        Toast.makeText(MainActivity.this,"BT ON", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
