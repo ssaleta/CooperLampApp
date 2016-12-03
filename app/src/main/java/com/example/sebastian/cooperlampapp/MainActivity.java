@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-
                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
