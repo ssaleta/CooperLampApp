@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import butterknife.BindView;
@@ -23,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
     private BluetoothSPP bt;
     private BluetoothAdapter bluetoothAdapter;
-    @BindView(R.id.radio_group) RadioGroup radioGroup;
+    @BindView(R.id.radio_group)
+    RadioGroup radioGroup;
     private String macAdressHC06 = "98:D3:31:90:32:EE";
     private Boolean handleClick = false;
 
@@ -40,19 +42,19 @@ public class MainActivity extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == R.id.on ){
+                if (checkedId == R.id.on && handleClick == true) {
                     sendMessage("1");
-                } else if(checkedId == R.id.off ){
+                } else if (checkedId == R.id.off && handleClick == true) {
                     sendMessage("2");
                 }
             }
         });
         initializeFilters();
-        intentConnectionFilters();
+
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-               Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
         bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
@@ -60,11 +62,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext()
                         , "Connected to " + name + "\n" + address
                         , Toast.LENGTH_SHORT).show();
+                handleClick = true;
             }
 
             public void onDeviceDisconnected() {
                 Toast.makeText(getApplicationContext()
                         , "Connection lost", Toast.LENGTH_SHORT).show();
+                handleClick = false;
             }
 
             public void onDeviceConnectionFailed() {
@@ -87,23 +91,22 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        try{
-            if(connectionReceiver != null)
-                unregisterReceiver(connectionReceiver);
-            if(receiver !=null)
-                unregisterReceiver(receiver);
-            }catch(Exception e){
-            }
-            super.onDestroy();
-            }
 
     @Override
-    public void onResume(){
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            if (receiver != null)
+                unregisterReceiver(receiver);
+        } catch (Exception e) {
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
-      }
+    }
 
     public void sendMessage(String string) {
         bt.send(string, true);
@@ -121,12 +124,6 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
     }
 
-    public void intentConnectionFilters(){
-        IntentFilter connectionFilter = new IntentFilter();
-        connectionFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        connectionFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        registerReceiver(connectionReceiver, connectionFilter);
-    }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -137,29 +134,14 @@ public class MainActivity extends AppCompatActivity {
                         BluetoothAdapter.ERROR);
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
-                        Toast.makeText(MainActivity.this,"BT OFF", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "BT OFF", Toast.LENGTH_SHORT).show();
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        Toast.makeText(MainActivity.this,"BT ON", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "BT ON", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
         }
     };
-    private final BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            switch(action){
-                case BluetoothDevice.ACTION_ACL_CONNECTED:
-                    Toast.makeText(MainActivity.this,"Connected with lamp", Toast.LENGTH_SHORT).show();
-                   /* handleClick = true;*/
-                    Log.d(TAG,"connected with lamp");
-                    break;
-                case BluetoothDevice.ACTION_ACL_DISCONNECTED:
-                    Toast.makeText(MainActivity.this,"Disconnected from the lamp", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
+
 }
