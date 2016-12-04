@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private RadioGroup radioGroup;
     private String macAdressHC06 = "98:D3:31:90:32:EE";
+    private Boolean handleClick = false;
 
 
     @Override
@@ -36,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == R.id.on){
+                if(checkedId == R.id.on && handleClick == true){
                     sendMessage("1");
-                } else if(checkedId == R.id.off){
+                } else if(checkedId == R.id.off && handleClick == true){
                     sendMessage("2");
                 }
             }
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
             switch(action){
                 case BluetoothDevice.ACTION_ACL_CONNECTED:
                     Toast.makeText(MainActivity.this,"Connected with lamp", Toast.LENGTH_SHORT).show();
+                    handleClick = true;
                     Log.d(TAG,"connected with lamp");
                     break;
                 case BluetoothDevice.ACTION_ACL_DISCONNECTED:
