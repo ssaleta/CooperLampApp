@@ -15,13 +15,15 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
     private BluetoothSPP bt;
     private BluetoothAdapter bluetoothAdapter;
-    private RadioGroup radioGroup;
+    @BindView(R.id.radio_group) RadioGroup radioGroup;
     private String macAdressHC06 = "98:D3:31:90:32:EE";
     private Boolean handleClick = false;
 
@@ -30,16 +32,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         bt = new BluetoothSPP(this);
         bluetoothAdapter = bt.getBluetoothAdapter();
-        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == R.id.on && handleClick == true){
+                if(checkedId == R.id.on ){
                     sendMessage("1");
-                } else if(checkedId == R.id.off && handleClick == true){
+                } else if(checkedId == R.id.off ){
                     sendMessage("2");
                 }
             }
@@ -150,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             switch(action){
                 case BluetoothDevice.ACTION_ACL_CONNECTED:
                     Toast.makeText(MainActivity.this,"Connected with lamp", Toast.LENGTH_SHORT).show();
-                    handleClick = true;
+                   /* handleClick = true;*/
                     Log.d(TAG,"connected with lamp");
                     break;
                 case BluetoothDevice.ACTION_ACL_DISCONNECTED:
