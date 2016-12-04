@@ -2,6 +2,7 @@ package com.example.sebastian.cooperlampapp;
 
 import android.bluetooth.BluetoothAdapter;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         initializeFilters();
+        intentConnectionFilters();
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
@@ -84,8 +87,10 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         try{
-            if(mReceiver!=null)
-                unregisterReceiver(mReceiver);
+            if(connectionReceiver != null)
+                unregisterReceiver(connectionReceiver);
+            if(receiver !=null)
+                unregisterReceiver(receiver);
             }catch(Exception e){
             }
             super.onDestroy();
@@ -109,10 +114,17 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         filter.addAction(String.valueOf(BluetoothAdapter.STATE_ON));
         filter.addAction(String.valueOf(BluetoothAdapter.STATE_OFF));
-        registerReceiver(mReceiver, filter);
+        registerReceiver(receiver, filter);
     }
 
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    public void intentConnectionFilters(){
+        IntentFilter connectionFilter = new IntentFilter();
+        connectionFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        connectionFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        registerReceiver(connectionReceiver, connectionFilter);
+    }
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -127,6 +139,21 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this,"BT ON", Toast.LENGTH_SHORT).show();
                         break;
                 }
+            }
+        }
+    };
+    private final BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            switch(action){
+                case BluetoothDevice.ACTION_ACL_CONNECTED:
+                    Toast.makeText(MainActivity.this,"Connected with lamp", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG,"connected with lamp");
+                    break;
+                case BluetoothDevice.ACTION_ACL_DISCONNECTED:
+                    Toast.makeText(MainActivity.this,"Disconnected from the lamp", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     };
