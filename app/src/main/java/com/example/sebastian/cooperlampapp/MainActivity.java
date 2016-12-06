@@ -1,8 +1,6 @@
 package com.example.sebastian.cooperlampapp;
 
 import android.bluetooth.BluetoothAdapter;
-
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +8,8 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import butterknife.BindView;
@@ -38,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         bt = new BluetoothSPP(this);
         bluetoothAdapter = bt.getBluetoothAdapter();
-
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -50,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         initializeFilters();
-
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
@@ -124,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
     }
 
-
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -143,5 +136,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
 }
