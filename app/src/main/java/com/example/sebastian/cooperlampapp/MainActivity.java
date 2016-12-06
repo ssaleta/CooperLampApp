@@ -15,7 +15,6 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
 public class MainActivity extends AppCompatActivity {
     private static String TAG = "MainActivity";
     private BluetoothSPP bt;
